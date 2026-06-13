@@ -1,0 +1,25 @@
+# Backup outputs
+*.log
+*.zip
+*_report_*.txt
+SysInfo_*.txt
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# PRIVATE — never push this
+docs/private/
