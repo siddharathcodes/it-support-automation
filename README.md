@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🛠️ IT Support Automation Toolkit
 
 A production-grade automation toolkit for IT Support Engineers — covering Windows, Linux, networking, printers, cameras, mobile, security, and full enterprise operations.
@@ -94,3 +95,7 @@ python scripts/cross-platform/ping_check.py --export
 ---
 
 > Maintained by IT Support Engineering. Built for real-world SME environments (50–500 users).
+=======
+# it-support-automation
+Production-grade IT support automation toolkit for Windows, Linux &amp; cross-platform. Scripts for system info, updates, backups, app installs, network drives, and host monitoring. Includes a full A–Z enterprise IT operations guide.
+>>>>>>> d4b72211b7e80dc056e559688543a4044ffe52b5
