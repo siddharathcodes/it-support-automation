@@ -1,7 +1,6 @@
 # ============================================================
-# restart_machine.ps1 — Schedule or force a machine restart
-# IT Support Automation Toolkit
-# Usage: .\restart_machine.ps1 [-DelayMinutes 10] [-Force] [-Remote "PC-NAME"] [-Message "reason"]
+# restart_machine.ps1 - Schedule or cancel a restart
+# Usage: powershell -ExecutionPolicy Bypass -File .\scripts\windows\restart_machine.ps1
 # ============================================================
 
 param(
@@ -12,62 +11,55 @@ param(
     [switch]$Cancel
 )
 
-function Write-Status($msg, $color = "White") {
-    Write-Host "  $msg" -ForegroundColor $color
-}
-
 $delaySec = $DelayMinutes * 60
 $target   = if ($Remote) { $Remote } else { $env:COMPUTERNAME }
 
-Write-Host "`n══════════════════════════════════════════" -ForegroundColor Cyan
-Write-Host "  Restart Manager — Target: $target" -ForegroundColor Yellow
-Write-Host "══════════════════════════════════════════`n" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "================================================" -ForegroundColor Cyan
+Write-Host "  RESTART MANAGER - Target: $target" -ForegroundColor Yellow
+Write-Host "================================================" -ForegroundColor Cyan
+Write-Host ""
 
-# ── Cancel pending restart ─────────────────────────────────────
 if ($Cancel) {
     if ($Remote) {
         Invoke-Command -ComputerName $Remote -ScriptBlock { shutdown /a }
     } else {
         shutdown /a
     }
-    Write-Status "[✔] Pending restart cancelled." "Green"
+    Write-Host "  [OK] Pending restart cancelled." -ForegroundColor Green
     exit 0
 }
 
-# ── Confirm before restart ─────────────────────────────────────
 if (-not $Force) {
-    Write-Status "Target  : $target"
-    Write-Status "Delay   : $DelayMinutes minute(s)"
-    Write-Status "Message : $Message" "Yellow"
-    $confirm = Read-Host "`n  Proceed with restart? (y/n)"
+    Write-Host "  Target  : $target"
+    Write-Host "  Delay   : $DelayMinutes minute(s)"
+    Write-Host "  Message : $Message" -ForegroundColor Yellow
+    Write-Host ""
+    $confirm = Read-Host "  Proceed? (y/n)"
     if ($confirm -ne "y") {
-        Write-Status "Restart cancelled by user." "Red"
+        Write-Host "  Cancelled." -ForegroundColor Red
         exit 0
     }
 }
 
-# ── Execute restart ────────────────────────────────────────────
-Write-Status "Scheduling restart in $DelayMinutes minute(s)..." "Yellow"
-
-$shutdownArgs = "/r /t $delaySec /c `"$Message`""
-if ($Force)  { $shutdownArgs += " /f" }
+Write-Host ""
+Write-Host "  Scheduling restart in $DelayMinutes minute(s)..." -ForegroundColor Yellow
 
 if ($Remote) {
-    # Remote restart via WMI (requires admin rights on remote)
     try {
         Invoke-Command -ComputerName $Remote -ScriptBlock {
-            param($args)
-            Start-Process shutdown -ArgumentList $args -NoNewWindow
-        } -ArgumentList $shutdownArgs
-        Write-Status "[✔] Restart scheduled on $Remote" "Green"
+            param($sec, $msg)
+            shutdown /r /t $sec /c $msg
+        } -ArgumentList $delaySec, $Message
+        Write-Host "  [OK] Restart scheduled on $Remote" -ForegroundColor Green
     } catch {
-        Write-Status "[✖] Remote restart failed: $_" "Red"
-        Write-Status "    Ensure WinRM is enabled on $Remote" "DarkGray"
+        Write-Host "  [X] Remote restart failed: $_" -ForegroundColor Red
+        Write-Host "      Make sure WinRM is enabled on $Remote" -ForegroundColor DarkGray
     }
 } else {
-    Start-Process shutdown -ArgumentList $shutdownArgs -NoNewWindow
-    Write-Status "[✔] Restart scheduled for $target in $DelayMinutes min(s)" "Green"
-    Write-Status "    Run with -Cancel to abort." "DarkGray"
+    shutdown /r /t $delaySec /c "$Message"
+    Write-Host "  [OK] Restart scheduled in $DelayMinutes min(s)" -ForegroundColor Green
+    Write-Host "  Run with -Cancel to abort." -ForegroundColor DarkGray
 }
 
 Write-Host ""

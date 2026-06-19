@@ -1,7 +1,6 @@
 # ============================================================
-# map_network_drives.ps1 — Map or unmap network drives
-# IT Support Automation Toolkit
-# Usage: .\map_network_drives.ps1 [-Action Map|Unmap|List] [-DriveLetter Z] [-UNCPath "\\server\share"]
+# map_network_drives.ps1 - Map or unmap network drives
+# Usage: powershell -ExecutionPolicy Bypass -File .\scripts\windows\map_network_drives.ps1
 # ============================================================
 
 param(
@@ -9,55 +8,48 @@ param(
     [string]$Action = "List",
     [string]$DriveLetter = "",
     [string]$UNCPath = "",
-    [string]$Label = "",
-    [switch]$Persistent,
-    [switch]$UseCredentials
+    [switch]$Persistent
 )
 
-# ── Predefined drive map (edit this section for your org) ────
+# Edit these for your office
 $DriveMap = @(
     @{ Letter = "H"; Path = "\\fileserver\home\$env:USERNAME"; Label = "Home Drive" }
     @{ Letter = "S"; Path = "\\fileserver\shared";             Label = "Shared Files" }
     @{ Letter = "T"; Path = "\\fileserver\tools";              Label = "IT Tools" }
 )
 
-function Write-Header($msg) {
-    Write-Host "`n  [$msg]" -ForegroundColor Cyan
+function Write-Section($msg) {
+    Write-Host ""
+    Write-Host "================================================" -ForegroundColor Cyan
+    Write-Host "  $msg" -ForegroundColor Yellow
+    Write-Host "================================================" -ForegroundColor Cyan
 }
 
-function Map-Drive($letter, $path, $label, $persist) {
-    $persist = if ($persist) { "Yes" } else { "No" }
-    Write-Header "Mapping $letter`: → $path"
-
+function Map-Drive($letter, $path, $persist) {
+    $p = if ($persist) { "Yes" } else { "No" }
     if (Test-Path "${letter}:") {
         Write-Host "  [!] Drive $letter already in use." -ForegroundColor Yellow
         return
     }
-
-    try {
-        net use "${letter}:" "$path" /persistent:$persist 2>&1 | Out-Null
-        if ($label) {
-            # Set volume label via shell (best-effort)
-            $shell = New-Object -ComObject Shell.Application
-        }
-        Write-Host "  [✔] Mapped $letter`: to $path" -ForegroundColor Green
-    } catch {
-        Write-Host "  [✖] Failed: $_" -ForegroundColor Red
+    net use "${letter}:" "$path" /persistent:$p 2>&1 | Out-Null
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "  [OK] Mapped $letter`: to $path" -ForegroundColor Green
+    } else {
+        Write-Host "  [X] Failed to map $letter`: to $path" -ForegroundColor Red
     }
 }
 
 function Unmap-Drive($letter) {
-    Write-Header "Unmapping $letter`:"
     if (-not (Test-Path "${letter}:")) {
         Write-Host "  [!] Drive $letter not mapped." -ForegroundColor Yellow
         return
     }
     net use "${letter}:" /delete /yes 2>&1 | Out-Null
-    Write-Host "  [✔] $letter`: unmapped." -ForegroundColor Green
+    Write-Host "  [OK] $letter`: unmapped." -ForegroundColor Green
 }
 
 function List-Drives {
-    Write-Header "Currently Mapped Network Drives"
+    Write-Section "CURRENTLY MAPPED DRIVES"
     $mapped = Get-SmbMapping -ErrorAction SilentlyContinue
     if (-not $mapped) {
         Write-Host "  No network drives currently mapped." -ForegroundColor Yellow
@@ -66,29 +58,26 @@ function List-Drives {
     $mapped | Format-Table LocalPath, RemotePath, Status -AutoSize
 }
 
-# ── Main ─────────────────────────────────────────────────────
 switch ($Action) {
     "List" {
         List-Drives
     }
     "Map" {
+        Write-Section "MAPPING DRIVES"
         if ($DriveLetter -and $UNCPath) {
-            # Manual single drive
-            Map-Drive $DriveLetter $UNCPath $Label $Persistent
+            Map-Drive $DriveLetter $UNCPath $Persistent
         } else {
-            # Map all predefined drives
-            Write-Host "`n  Mapping all predefined drives..." -ForegroundColor Cyan
             foreach ($drive in $DriveMap) {
-                Map-Drive $drive.Letter $drive.Path $drive.Label $Persistent
+                Map-Drive $drive.Letter $drive.Path $Persistent
             }
         }
         List-Drives
     }
     "Unmap" {
+        Write-Section "UNMAPPING DRIVES"
         if ($DriveLetter) {
             Unmap-Drive $DriveLetter
         } else {
-            Write-Host "`n  Unmapping all predefined drives..." -ForegroundColor Cyan
             foreach ($drive in $DriveMap) {
                 Unmap-Drive $drive.Letter
             }

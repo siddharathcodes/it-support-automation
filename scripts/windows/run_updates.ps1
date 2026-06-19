@@ -1,8 +1,6 @@
 # ============================================================
-# run_updates.ps1 — Trigger Windows Update silently
-# IT Support Automation Toolkit
-# Usage: .\run_updates.ps1 [-AutoRestart] [-DriverUpdates]
-# Requires: PSWindowsUpdate module (auto-installs if missing)
+# run_updates.ps1 - Windows Update automation
+# Usage: powershell -ExecutionPolicy Bypass -File .\scripts\windows\run_updates.ps1
 # ============================================================
 
 param(
@@ -10,61 +8,70 @@ param(
     [switch]$DriverUpdates
 )
 
-function Write-Section($msg) {
-    Write-Host "`n══ $msg ══" -ForegroundColor Cyan
+# Admin check
+if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]"Administrator")) {
+    Write-Host "[X] Run PowerShell as Administrator for updates." -ForegroundColor Red
+    exit 1
 }
 
-# ── Ensure PSWindowsUpdate module ────────────────────────────
-Write-Section "Checking PSWindowsUpdate Module"
+function Write-Section($msg) {
+    Write-Host ""
+    Write-Host "================================================" -ForegroundColor Cyan
+    Write-Host "  $msg" -ForegroundColor Yellow
+    Write-Host "================================================" -ForegroundColor Cyan
+}
+
+Write-Section "WINDOWS UPDATE"
+
+# Install PSWindowsUpdate if missing
+Write-Host "  Checking PSWindowsUpdate module..." -ForegroundColor White
 if (-not (Get-Module -ListAvailable -Name PSWindowsUpdate)) {
-    Write-Host "  Installing PSWindowsUpdate..." -ForegroundColor Yellow
+    Write-Host "  Installing PSWindowsUpdate module..." -ForegroundColor Yellow
     Install-PackageProvider -Name NuGet -Force -Scope CurrentUser | Out-Null
     Install-Module PSWindowsUpdate -Force -Scope CurrentUser -SkipPublisherCheck
-    Write-Host "  [✔] Module installed." -ForegroundColor Green
+    Write-Host "  [OK] Module installed." -ForegroundColor Green
 } else {
-    Write-Host "  [✔] PSWindowsUpdate already installed." -ForegroundColor Green
+    Write-Host "  [OK] PSWindowsUpdate already available." -ForegroundColor Green
 }
 
 Import-Module PSWindowsUpdate
 
-# ── Check available updates ──────────────────────────────────
-Write-Section "Scanning for Updates"
+# Check for updates
+Write-Section "SCANNING FOR UPDATES"
 $updates = Get-WindowsUpdate -MicrosoftUpdate -AcceptAll -IgnoreReboot
 
 if ($updates.Count -eq 0) {
-    Write-Host "  [✔] System is up to date. No updates found." -ForegroundColor Green
+    Write-Host "  [OK] System is fully up to date." -ForegroundColor Green
     exit 0
 }
 
-Write-Host "  Found $($updates.Count) update(s):`n" -ForegroundColor Yellow
+Write-Host "  Found $($updates.Count) update(s):" -ForegroundColor Yellow
 $updates | Select-Object Title, Size, MsrcSeverity | Format-Table -AutoSize
 
-# ── Install updates ──────────────────────────────────────────
-Write-Section "Installing Updates"
+# Install updates
+Write-Section "INSTALLING UPDATES"
 
 $params = @{
-    MicrosoftUpdate  = $true
-    AcceptAll        = $true
-    IgnoreReboot     = (-not $AutoRestart)
-    AutoReboot       = $AutoRestart
-    Verbose          = $false
-}
-
-if ($DriverUpdates) {
-    $params["UpdateType"] = "Driver"
+    MicrosoftUpdate = $true
+    AcceptAll       = $true
+    IgnoreReboot    = (-not $AutoRestart)
+    AutoReboot      = $AutoRestart
 }
 
 Install-WindowsUpdate @params
 
-# ── Reboot prompt ─────────────────────────────────────────────
+# Restart prompt
 if (-not $AutoRestart) {
-    $reboot = Read-Host "`n  Updates installed. Restart now? (y/n)"
+    Write-Host ""
+    $reboot = Read-Host "  Updates done. Restart now? (y/n)"
     if ($reboot -eq "y") {
         Write-Host "  Restarting in 30 seconds..." -ForegroundColor Yellow
-        shutdown /r /t 30 /c "IT Support: System restart after Windows Update"
+        shutdown /r /t 30 /c "IT Support: Restarting after Windows Update"
     } else {
-        Write-Host "  [!] Restart pending. Please restart at your earliest convenience." -ForegroundColor Yellow
+        Write-Host "  [!] Please restart soon to apply updates." -ForegroundColor Yellow
     }
 }
 
-Write-Host "`n[✔] Update process complete.`n" -ForegroundColor Green
+Write-Host ""
+Write-Host "[OK] Update process complete." -ForegroundColor Green
+Write-Host ""

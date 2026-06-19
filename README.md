@@ -1,101 +1,120 @@
-<<<<<<< HEAD
-# 🛠️ IT Support Automation Toolkit
+# IT Support Automation Toolkit
 
-A production-grade automation toolkit for IT Support Engineers — covering Windows, Linux, networking, printers, cameras, mobile, security, and full enterprise operations.
+![PowerShell](https://img.shields.io/badge/PowerShell-5391FE?style=flat&logo=powershell&logoColor=white)
+![Shell](https://img.shields.io/badge/Shell-121011?style=flat&logo=gnu-bash&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
+![License](https://img.shields.io/github/license/siddharathcodes/it-support-automation)
 
-## 📁 Repo Structure
-
-```
-it-support-automation/
-├── scripts/
-│   ├── windows/
-│   │   ├── system_info.ps1         # Full system snapshot
-│   │   ├── map_network_drives.ps1  # Map/unmap network drives
-│   │   ├── install_apps.ps1        # Silent bulk installs (winget)
-│   │   ├── run_updates.ps1         # Windows Update automation
-│   │   ├── backup_user_data.ps1    # User profile backup
-│   │   └── restart_machine.ps1     # Scheduled/remote restart
-│   ├── linux/
-│   │   ├── system_info.sh          # Full system snapshot
-│   │   ├── install_apps.sh         # Package install by profile
-│   │   ├── run_updates.sh          # Cross-distro update script
-│   │   ├── backup_user_data.sh     # rsync-based user backup
-│   │   └── restart_machine.sh      # Scheduled restart + broadcast
-│   └── cross-platform/
-│       └── ping_check.py           # Parallel host ping checker
-├── docs/
-│   ├── public/
-│   │   ├── ENTERPRISE_IT_GUIDE.md  # A–Z enterprise IT operations guide
-│   │   └── USAGE.md                # How to use every script
-│   └── private/                    # .gitignored — local only
-└── .gitignore
-```
-
-## ⚡ Quick Start
-
-### Windows (run as Administrator)
-```powershell
-Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-.\scripts\windows\system_info.ps1
-.\scripts\windows\install_apps.ps1 -Profile Basic
-.\scripts\windows\run_updates.ps1 -AutoRestart
-```
-
-### Linux
-```bash
-chmod +x scripts/linux/*.sh
-sudo ./scripts/linux/system_info.sh --export
-sudo ./scripts/linux/run_updates.sh --auto-restart
-```
-
-### Python (cross-platform)
-```bash
-python scripts/cross-platform/ping_check.py --export
-```
-
-## 📚 Documentation
-
-| Doc | What it covers |
-|-----|----------------|
-| [USAGE.md](docs/public/USAGE.md) | When and how to run every script |
-| [ENTERPRISE_IT_GUIDE.md](docs/public/ENTERPRISE_IT_GUIDE.md) | Full A–Z IT operations — AD, networking, printers, cameras, MDM, security, monitoring, automation |
-
-## ✅ What This Toolkit Solves
-
-| Task | Windows | Linux |
-|------|---------|-------|
-| System info & auditing | ✅ | ✅ |
-| Network drive mapping | ✅ | — |
-| Bulk app installation | ✅ | ✅ |
-| Patch management | ✅ | ✅ |
-| User data backup | ✅ | ✅ |
-| Scheduled restart | ✅ | ✅ |
-| Host reachability check | ✅ Python | ✅ Python |
-
-## 🔧 Requirements
-
-- **Windows:** PowerShell 5.1+, winget (App Installer)
-- **Linux:** bash, rsync, curl
-- **Python:** 3.8+ (no external packages)
-
-## 📖 Enterprise IT Guide Covers
-
-- Active Directory & user lifecycle management
-- VLAN segmentation & firewall rules
-- Printer setup, print servers, CUPS
-- IP camera placement & NVR configuration
-- Mobile Device Management (Intune, Jamf)
-- Backup & disaster recovery (3-2-1 rule, Veeam, Restic)
-- Security hardening & incident response
-- Monitoring (Zabbix, Grafana, Uptime Kuma)
-- Onboarding & offboarding automation
-- Cloud & SaaS management (M365, Google Workspace)
-- Full automation maturity roadmap (scripts → Ansible → Terraform)
+Production-grade IT support automation scripts for Windows, Linux, and cross-platform environments.
+Covers system info, updates, backups, app installs, auto-repair, network drives, and host monitoring.
 
 ---
 
-> Maintained by IT Support Engineering. Built for real-world SME environments (50–500 users).
-=======
-# it-support-automation
-Production-grade IT support automation toolkit for Windows, Linux &amp; cross-platform. Scripts for system info, updates, backups, app installs, network drives, and host monitoring. Includes a full A–Z enterprise IT operations guide.
->>>>>>> d4b72211b7e80dc056e559688543a4044ffe52b5
+## Quick Start
+
+### Windows (run as Administrator)
+
+```powershell
+# Step 1 - Clone or download the repo
+git clone https://github.com/siddharathcodes/it-support-automation.git
+cd it-support-automation
+
+# Step 2 - Run setup (one time only)
+.\SETUP.bat
+
+# Step 3 - Launch master control panel
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\master.ps1
+```
+
+### Without cloning (run directly from internet)
+
+```powershell
+irm https://raw.githubusercontent.com/siddharathcodes/it-support-automation/main/scripts/windows/system_info.ps1 | iex
+```
+
+### Linux
+
+```bash
+chmod +x scripts/linux/*.sh
+sudo ./scripts/linux/system_info.sh --export
+sudo ./scripts/linux/run_updates.sh
+```
+
+---
+
+## Repo Structure
+
+```
+it-support-automation/
+├── SETUP.bat                        # One-click setup for Windows
+├── scripts/
+│   ├── windows/
+│   │   ├── master.ps1               # Master control panel (run this)
+│   │   ├── system_info.ps1          # Full system snapshot + export
+│   │   ├── install_apps.ps1         # Numbered app installer menu
+│   │   ├── run_updates.ps1          # Windows Update automation
+│   │   ├── backup_user_data.ps1     # User profile backup + ZIP
+│   │   ├── auto_repair.ps1          # SFC + DISM + drivers + network fix
+│   │   ├── map_network_drives.ps1   # Map/unmap network drives
+│   │   └── restart_machine.ps1      # Scheduled/remote restart
+│   ├── linux/
+│   │   ├── system_info.sh           # Full system snapshot
+│   │   ├── install_apps.sh          # Package install by profile
+│   │   ├── run_updates.sh           # Cross-distro update script
+│   │   ├── backup_user_data.sh      # rsync-based user backup
+│   │   └── restart_machine.sh       # Scheduled restart + broadcast
+│   └── cross-platform/
+│       └── ping_check.py            # Parallel host ping checker
+├── docs/
+│   └── public/
+│       ├── ENTERPRISE_IT_GUIDE.md   # A-Z enterprise IT operations guide
+│       └── USAGE.md                 # Full flag reference for every script
+└── .gitignore
+```
+
+---
+
+## What Each Script Does
+
+| Script | What it solves |
+|--------|---------------|
+| `master.ps1` | Single numbered menu — run everything from one place |
+| `system_info.ps1` | PC slow? Audit a machine? Export full report |
+| `install_apps.ps1` | New PC setup — pick apps by number, installs silently |
+| `run_updates.ps1` | Monthly patching, force update any machine |
+| `backup_user_data.ps1` | Before reimaging, offboarding, failing disk |
+| `auto_repair.ps1` | Corrupt files, broken drivers, internet issues, stuck updates |
+| `map_network_drives.ps1` | New hire onboarding, drives lost after reboot |
+| `restart_machine.ps1` | After updates, remote reboot with delay |
+| `ping_check.py` | Network down — check which hosts are alive |
+
+---
+
+## Enterprise IT Guide
+
+The `docs/public/ENTERPRISE_IT_GUIDE.md` covers A-Z operations for 50-500 user companies:
+
+- Active Directory and user lifecycle management
+- VLAN segmentation and firewall rules
+- Printer setup, print servers, stuck queue fixes
+- IP camera placement and NVR configuration
+- Mobile Device Management (Intune, Jamf)
+- Backup and disaster recovery (3-2-1 rule, Veeam, Restic)
+- Security hardening and incident response playbooks
+- Monitoring with Zabbix, Grafana, Uptime Kuma
+- Onboarding and offboarding automation
+- Full automation maturity roadmap (scripts to Ansible to Terraform)
+
+---
+
+## Requirements
+
+- **Windows scripts:** PowerShell 5.1+, winget (App Installer from Microsoft Store)
+- **Linux scripts:** bash, rsync, curl
+- **Python script:** Python 3.8+ (no external packages needed)
+
+---
+
+## License
+
+MIT License - see LICENSE file for details.
