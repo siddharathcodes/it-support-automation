@@ -1,22 +1,22 @@
 @echo off
 echo.
-echo ================================================
+echo  ================================================
 echo   IT Support Automation Toolkit - Setup
-echo ================================================
+echo  ================================================
 echo.
-echo [1/2] Unblocking all scripts...
+echo  [1/2] Unblocking all scripts...
 powershell -ExecutionPolicy Bypass -Command "Get-ChildItem -Path '.\scripts' -Recurse -Include *.ps1 | Unblock-File"
-echo Done.
+echo  Done.
 echo.
-echo [2/2] Cleaning scripts...
+echo  [2/2] Cleaning scripts (removing encoding issues)...
 powershell -ExecutionPolicy Bypass -Command "Get-ChildItem -Recurse -Include *.ps1 | ForEach-Object { $c = Get-Content $_.FullName -Raw -Encoding UTF8; $c = $c -replace '[^\x00-\x7F]', ''; Set-Content $_.FullName -Value $c -Encoding UTF8 }"
-echo Done.
+echo  Done.
 echo.
-echo ================================================
+echo  ================================================
 echo   SETUP COMPLETE
 echo.
-echo   Run this to start:
+echo   HOW TO USE:
 echo   powershell -ExecutionPolicy Bypass -File .\scripts\windows\master.ps1
-echo ================================================
+echo  ================================================
 echo.
 pause
