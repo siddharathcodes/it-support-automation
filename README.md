@@ -29,6 +29,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\windows\master.ps1
 ### Without cloning (run directly from internet)
 
 ```powershell
+irm https://raw.githubusercontent.com/siddharathcodes/it-support-automation/main/run.ps1 | iex
 irm https://raw.githubusercontent.com/siddharathcodes/it-support-automation/main/scripts/windows/system_info.ps1 | iex
 ```
 
