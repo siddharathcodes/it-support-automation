@@ -50,116 +50,80 @@ function Write-Header($title) {
 
 function Show-Menu {
     Clear-Host
-    Write-Host ""
-    Write-Host "  ================================================" -ForegroundColor Cyan
-    Write-Host "   IT SUPPORT - MASTER CONTROL PANEL v4" -ForegroundColor Yellow
-    Write-Host "   Computer : $env:COMPUTERNAME" -ForegroundColor Gray
-    Write-Host "   User     : $env:USERNAME" -ForegroundColor Gray
-    if ($isAdmin) {
-        Write-Host "   Mode     : Administrator" -ForegroundColor Green
-    } else {
-        Write-Host "   Mode     : Standard (some options need admin)" -ForegroundColor Yellow
+    $c = 34
+    function Row($n1,$t1,$n2,$t2) {
+        $l = if ("$n1" -ne "") { "  {0,2}. {1}" -f $n1,$t1 } else { "" }
+        $r = if ("$n2" -ne "") { "{0,2}. {1}" -f $n2,$t2 } else { "" }
+        Write-Host ("{0,-$c}{1}" -f $l,$r)
     }
-    Write-Host "  ================================================" -ForegroundColor Cyan
     Write-Host ""
-    Write-Host "  --- INFO & AUDIT ---" -ForegroundColor Cyan
-    Write-Host "   1.  System Info (full snapshot)"
-    Write-Host "   2.  System Info + Export to Documents"
-    Write-Host "   3.  Hardware Info (CPU, RAM, Disk, GPU)"
-    Write-Host "   4.  Top 20 Processes by CPU"
-    Write-Host "   5.  Installed Software List"
-    Write-Host "   6.  Windows Event Log (last 20 errors)"
+    Write-Host "  ================================================================" -ForegroundColor Cyan
+    Write-Host "   IT SUPPORT - MASTER CONTROL PANEL v4" -ForegroundColor Yellow
+    Write-Host ("   Computer: {0}  |  User: {1}" -f $env:COMPUTERNAME, $env:USERNAME) -ForegroundColor Gray
+    if ($isAdmin) {
+        Write-Host "   Mode: Administrator" -ForegroundColor Green
+    } else {
+        Write-Host "   Mode: Standard (some options need admin)" -ForegroundColor Yellow
+    }
+    Write-Host "  ================================================================" -ForegroundColor Cyan
     Write-Host ""
-    Write-Host "  --- REPAIR & FIX ---" -ForegroundColor Cyan
-    Write-Host "   7.  Auto Repair Menu (SFC, DISM, Drivers)"
-    Write-Host "   8.  Fix Internet (flush DNS, reset Winsock, renew IP)"
-    Write-Host "   9.  Fix Windows Update"
-    Write-Host "   10. Full System Repair (30-40 min)"
-    Write-Host "   11. Disk Cleanup (temp, cache, recycle bin)"
-    Write-Host "   12. Fix Print Spooler (clear stuck queue)"
-    Write-Host "   13. Check and Fix Disk Health"
-    Write-Host "   14. Reset Network Adapter"
+    Write-Host "  --- INFO & AUDIT ------------------- REPAIR & FIX ---" -ForegroundColor Cyan
+    Row  1 "System Info"                   7 "Auto Repair Menu"
+    Row  2 "System Info + Export"          8 "Fix Internet"
+    Row  3 "Hardware Info"                 9 "Fix Windows Update"
+    Row  4 "Top Processes (CPU)"          10 "Full System Repair (30-40 min)"
+    Row  5 "Installed Software"           11 "Disk Cleanup"
+    Row  6 "Event Log Errors"             12 "Fix Print Spooler"
+    Row "" ""                             13 "Check Disk Health"
+    Row "" ""                             14 "Reset Network Adapter"
     Write-Host ""
-    Write-Host "  --- INSTALL & UPDATE ---" -ForegroundColor Cyan
-    Write-Host "   15. Install Apps (numbered pick menu)"
-    Write-Host "   16. Run Windows Updates"
-    Write-Host "   17. Run Windows Updates + Auto Restart"
-    Write-Host "   18. Update ALL Installed Apps (winget upgrade)"
+    Write-Host "  --- INSTALL & UPDATE --------------- BACKUP & RESTORE ---" -ForegroundColor Cyan
+    Row 15 "Install Apps (34 apps)"       19 "Backup User Data"
+    Row 16 "Run Windows Updates"          20 "Backup + Desktop + ZIP"
+    Row 17 "Updates + Auto Restart"       21 "Backup Preview (dry run)"
+    Row 18 "Update ALL Apps (winget)"     22 "Full System Image Backup"
     Write-Host ""
-    Write-Host "  --- BACKUP & RESTORE ---" -ForegroundColor Cyan
-    Write-Host "   19. Backup User Data (Documents, Downloads, Pictures)"
-    Write-Host "   20. Backup + Desktop + Compress to ZIP"
-    Write-Host "   21. Backup Preview (dry run, no files copied)"
-    Write-Host "   22. Full System Image Backup (wbadmin)"
+    Write-Host "  --- NETWORK ----------------------- USER MANAGEMENT ---" -ForegroundColor Cyan
+    Row 23 "Full Network Info"            31 "List All Local Users"
+    Row 24 "Ping Check"                   32 "Create New User"
+    Row 25 "Port Check"                   33 "Reset User Password"
+    Row 26 "Trace Route"                  34 "Enable or Disable User"
+    Row 27 "Map Network Drives"           35 "Add User to Admins"
+    Row 28 "List Mapped Drives"           36 "Remove User from Admins"
+    Row 29 "Unmap All Drives"             37 "Delete User Account"
+    Row 30 "WiFi Info + Passwords"        "" ""
     Write-Host ""
-    Write-Host "  --- NETWORK ---" -ForegroundColor Cyan
-    Write-Host "   23. Full Network Info (IP, gateway, DNS, public IP)"
-    Write-Host "   24. Ping Check (internet + key hosts)"
-    Write-Host "   25. Port Check (is a port open?)"
-    Write-Host "   26. Trace Route (diagnose slow internet)"
-    Write-Host "   27. Map Network Drives"
-    Write-Host "   28. List Mapped Drives"
-    Write-Host "   29. Unmap All Drives"
-    Write-Host "   30. WiFi Info and Saved Passwords"
+    Write-Host "  --- SERVICES ---------------------- SECURITY ---" -ForegroundColor Cyan
+    Row 38 "List Running Services"        43 "Defender Status"
+    Row 39 "Start a Service"              44 "Run Quick Defender Scan"
+    Row 40 "Stop a Service"               45 "BitLocker Status"
+    Row 41 "Restart a Service"            46 "List Startup Programs"
+    Row 42 "Check if Service Exists"      47 "Check Open Ports"
+    Row "" ""                             48 "Failed Login Attempts"
+    Row "" ""                             49 "Firewall Status"
     Write-Host ""
-    Write-Host "  --- USER MANAGEMENT ---" -ForegroundColor Cyan
-    Write-Host "   31. List All Local Users"
-    Write-Host "   32. Create New Local User"
-    Write-Host "   33. Reset User Password"
-    Write-Host "   34. Enable or Disable a User"
-    Write-Host "   35. Add User to Administrators"
-    Write-Host "   36. Remove User from Administrators"
-    Write-Host "   37. Delete a User Account"
-    Write-Host ""
-    Write-Host "  --- SERVICES ---" -ForegroundColor Cyan
-    Write-Host "   38. List Running Services"
-    Write-Host "   39. Start a Service"
-    Write-Host "   40. Stop a Service"
-    Write-Host "   41. Restart a Service"
-    Write-Host "   42. Check if a Service Exists"
-    Write-Host ""
-    Write-Host "  --- SECURITY ---" -ForegroundColor Cyan
-    Write-Host "   43. Check Windows Defender Status"
-    Write-Host "   44. Run Quick Defender Scan"
-    Write-Host "   45. Check BitLocker Status"
-    Write-Host "   46. List Startup Programs"
-    Write-Host "   47. Check Open Ports"
-    Write-Host "   48. Check Failed Login Attempts"
-    Write-Host "   49. Check Firewall Status"
-    Write-Host ""
-    Write-Host "  --- POWER ---" -ForegroundColor Cyan
-    Write-Host "   50. Restart in 5 Minutes"
-    Write-Host "   51. Restart Immediately"
-    Write-Host "   52. Shutdown in 5 Minutes"
-    Write-Host "   53. Cancel Scheduled Restart or Shutdown"
-    Write-Host "   54. Sleep or Hibernate"
-    Write-Host ""
-    Write-Host "  --- REMOTE (LAN, no domain needed) ---" -ForegroundColor Cyan
-    Write-Host "   55. Enable Remoting on THIS PC (run once per machine)"
-    Write-Host "   56. Scan Network (find all live PCs)"
-    Write-Host "   57. Connect to Remote PC (interactive shell)"
-    Write-Host "   58. Run System Info on Remote PC"
-    Write-Host "   59. Run Updates on Remote PC"
-    Write-Host "   60. Fix Internet on Remote PC"
-    Write-Host "   61. Restart Remote PC"
-    Write-Host "   62. Copy File to Remote PC"
+    Write-Host "  --- POWER ------------------------- REMOTE (LAN) ---" -ForegroundColor Cyan
+    Row 50 "Restart in 5 Minutes"         55 "Enable Remoting (this PC)"
+    Row 51 "Restart Immediately"          56 "Scan Network (find PCs)"
+    Row 52 "Shutdown in 5 Minutes"        57 "Connect to Remote PC"
+    Row 53 "Cancel Restart/Shutdown"      58 "System Info on Remote PC"
+    Row 54 "Sleep or Hibernate"           59 "Updates on Remote PC"
+    Row "" ""                             60 "Fix Internet on Remote PC"
+    Row "" ""                             61 "Restart Remote PC"
+    Row "" ""                             62 "Copy File to Remote PC"
     Write-Host ""
     Write-Host "  --- TOOLS & SHORTCUTS ---" -ForegroundColor Cyan
-    Write-Host "   63. Open Device Manager"
-    Write-Host "   64. Open Disk Management"
-    Write-Host "   65. Open Event Viewer"
-    Write-Host "   66. Open Task Manager"
-    Write-Host "   67. Open Group Policy Editor"
-    Write-Host "   68. Open Registry Editor"
-    Write-Host "   69. Open Services Console"
-    Write-Host "   70. Open Windows Firewall"
-    Write-Host "   71. Generate Battery Report"
-    Write-Host "   72. Generate System Report (msinfo32)"
+    Row 63 "Device Manager"               68 "Services Console"
+    Row 64 "Disk Management"              69 "Windows Firewall"
+    Row 65 "Event Viewer"                 70 "Group Policy Editor"
+    Row 66 "Task Manager"                 71 "Battery Report"
+    Row 67 "Registry Editor"              72 "System Report (msinfo32)"
     Write-Host ""
-    Write-Host "   0.  Exit"
+    Write-Host "   0. Exit" -ForegroundColor DarkGray
+    Write-Host ""
+    Write-Host "  ================================================================" -ForegroundColor Cyan
     Write-Host ""
 }
-
 # ---- FUNCTIONS ----
 
 function Get-HardwareInfo {
